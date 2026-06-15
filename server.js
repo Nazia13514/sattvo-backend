@@ -28,14 +28,14 @@ app.use(express.json());
 // Product Catalog for Backend Price Validation
 // Replace these with your exact prices
 const catalog = {
-  "Almond Sattvo 500g": 650,
-  "Walnut Sattvo 500g": 650,
-  "Cashew Sattvo 500g": 650,
-  "Pistachio Sattvo 500g": 650,
-  "Almond Sattvo 250g": 350,
-  "Walnut Sattvo 250g": 350,
-  "Cashew Sattvo 250g": 350,
-  "Pistachio Sattvo 250g": 350
+  "Almond Sattvo 500g": 399,
+  "Walnut Sattvo 500g": 399,
+  "Cashew Sattvo 500g": 399,
+  "Pistachio Sattvo 500g": 399,
+  "Almond Sattvo 250g": 299,
+  "Walnut Sattvo 250g": 299,
+  "Cashew Sattvo 250g": 299,
+  "Pistachio Sattvo 250g": 299
 };
 
 // ==========================================
@@ -185,32 +185,32 @@ app.post('/api/submit-order', async (req, res) => {
       if (!itemPrice) {
         throw new Error(`Product "${item.name}" not found in catalog.`);
       }
-      
+
       // TASK 5: CHECK CART PAYLOAD
       console.log(`Product: ${item.name}`);
       console.log(`Quantity: ${item.qty}`);
       console.log(`Frontend Price: ${item.price} (if sent)`);
       console.log(`Backend Price: ${itemPrice}`);
-      
+
       calculatedAmount += itemPrice * item.qty;
     });
 
     console.log("Calculated Total (Expected):", calculatedAmount);
-    
+
     // TASK 6: VERIFY TOTAL CALCULATION
     console.log(`Comparing Frontend Total: ${totalAmount} vs Backend Calculated Total: ${calculatedAmount}`);
 
     if (calculatedAmount !== totalAmount) {
       console.log("Validation Result: FAILED (Price Mismatch)");
       // TASK 2: RETURN DETAILED ERROR INFORMATION
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Price mismatch",
         expectedTotal: calculatedAmount,
         receivedTotal: totalAmount,
         cart: cart
       });
     }
-    
+
     console.log("Validation Result: PASSED");
     console.log("==================================");
 
