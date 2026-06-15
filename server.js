@@ -12,7 +12,13 @@ const PORT = process.env.PORT || 3000;
 
 // ✅ MIDDLEWARE
 app.use(cors({
-  origin: "*",
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (origin.endsWith('netlify.app')) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS not allowed'), false);
+  },
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"]
 }));
@@ -22,10 +28,14 @@ app.use(express.json());
 // Product Catalog for Backend Price Validation
 // Replace these with your exact prices
 const catalog = {
-  "Almond Sattvo": 350,
-  "Walnut Sattvo": 350,
-  "Cashew Sattvo": 350,
-  "Pistachio Sattvo": 350
+  "Almond Sattvo 500g": 650,
+  "Walnut Sattvo 500g": 650,
+  "Cashew Sattvo 500g": 650,
+  "Pistachio Sattvo 500g": 650,
+  "Almond Sattvo 250g": 350,
+  "Walnut Sattvo 250g": 350,
+  "Cashew Sattvo 250g": 350,
+  "Pistachio Sattvo 250g": 350
 };
 
 // ==========================================
@@ -66,8 +76,7 @@ async function saveToGoogleSheets(orderData) {
           orderData.customer.phone,
           orderData.customer.email,
           orderData.customer.address,
-          orderData.cart.map(i => `${i.name}`).join(", "),
-          orderData.cart.map(i => i.qty).join(", "),
+          orderData.cart.map(i => `${i.name} × ${i.qty}`).join(", "),
           orderData.totalAmount
         ]]
       }
