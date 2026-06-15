@@ -171,19 +171,48 @@ app.post('/api/submit-order', async (req, res) => {
       return res.status(400).json({ error: "Cart is empty" });
     }
 
-    // Backend price validation (optional but good practice)
+    // TASK 1: ADD COMPLETE DEBUG LOGGING
+    console.log("====== ORDER VALIDATION LOG ======");
+    console.log("Received Customer:", JSON.stringify(customer, null, 2));
+    console.log("Received Cart:", JSON.stringify(cart, null, 2));
+    console.log("Received Total:", totalAmount);
+    console.log("Catalog Used:", JSON.stringify(catalog, null, 2));
+
+    // Backend price validation
     let calculatedAmount = 0;
     cart.forEach(item => {
       const itemPrice = catalog[item.name];
       if (!itemPrice) {
         throw new Error(`Product "${item.name}" not found in catalog.`);
       }
+      
+      // TASK 5: CHECK CART PAYLOAD
+      console.log(`Product: ${item.name}`);
+      console.log(`Quantity: ${item.qty}`);
+      console.log(`Frontend Price: ${item.price} (if sent)`);
+      console.log(`Backend Price: ${itemPrice}`);
+      
       calculatedAmount += itemPrice * item.qty;
     });
 
+    console.log("Calculated Total (Expected):", calculatedAmount);
+    
+    // TASK 6: VERIFY TOTAL CALCULATION
+    console.log(`Comparing Frontend Total: ${totalAmount} vs Backend Calculated Total: ${calculatedAmount}`);
+
     if (calculatedAmount !== totalAmount) {
-      return res.status(400).json({ error: "Price mismatch. Please refresh and try again." });
+      console.log("Validation Result: FAILED (Price Mismatch)");
+      // TASK 2: RETURN DETAILED ERROR INFORMATION
+      return res.status(400).json({ 
+        error: "Price mismatch",
+        expectedTotal: calculatedAmount,
+        receivedTotal: totalAmount,
+        cart: cart
+      });
     }
+    
+    console.log("Validation Result: PASSED");
+    console.log("==================================");
 
     const orderData = {
       customer: customer,
